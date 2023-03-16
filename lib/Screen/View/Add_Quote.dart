@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +14,7 @@ class Add_Quote extends StatefulWidget {
 }
 
 class _Add_QuoteState extends State<Add_Quote> {
-  TextEditingController txtcategory = TextEditingController();
+  TextEditingController txtimage = TextEditingController();
   TextEditingController txtquote = TextEditingController();
   TextEditingController txtauthor_name = TextEditingController();
 
@@ -39,10 +40,20 @@ class _Add_QuoteState extends State<Add_Quote> {
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Create Quote",
-                    style:
-                        GoogleFonts.satisfy(fontSize: 20, color: Colors.white),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Get.toNamed('/');
+                        },
+                        icon: Icon(Icons.arrow_back_outlined,color: Colors.white,),
+                      ),
+                      Text(
+                        "Create Quote",
+                        style: GoogleFonts.satisfy(
+                            fontSize: 20, color: Colors.white),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -52,20 +63,10 @@ class _Add_QuoteState extends State<Add_Quote> {
                 child: Column(
                   children: [
                     TextField(
-                      controller: txtcategory,
-                      decoration: InputDecoration(
-                        label: Text("Category"),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    TextField(
-                      style: TextStyle(height: 3),
+                      maxLines: 3,
                       controller: txtquote,
                       decoration: InputDecoration(
-                        label: Text("Quote "),
+                        label: Text("Quote"),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -75,7 +76,17 @@ class _Add_QuoteState extends State<Add_Quote> {
                     TextField(
                       controller: txtauthor_name,
                       decoration: InputDecoration(
-                        label: Text("Author Name"),
+                        label: Text("Author_Name "),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    TextField(
+                      controller: txtimage,
+                      decoration: InputDecoration(
+                        label: Text("Image Link"),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -87,15 +98,16 @@ class _Add_QuoteState extends State<Add_Quote> {
               ),
               ElevatedButton(
                 onPressed: () {
+                  Fluttertoast.showToast(msg:"Quotes Done",toastLength: Toast.LENGTH_SHORT);
                   Database_Helper db_helper = Database_Helper();
                   db_helper.insertdb(
-                    txtcategory.text,
+                    txtimage.text,
                     txtquote.text,
                     txtauthor_name.text,
                   );
-                  Get.toNamed('/');
+                  Get.back();
                 },
-                child: Text("Submit"),
+                child: Text("Submit",),
               ),
             ],
           ),

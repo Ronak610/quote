@@ -39,6 +39,7 @@ class _Show_ScreenState extends State<Show_Screen> {
                 () => Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       "${home_controller.quotelist[home_controller.int.value].quote}",
@@ -79,6 +80,7 @@ class _Show_ScreenState extends State<Show_Screen> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -87,7 +89,7 @@ class _Show_ScreenState extends State<Show_Screen> {
                         if (home_controller.change.value == 5) {
                           home_controller.change.value = 0;
                         } else {
-                          home_controller.change.value ++;
+                          home_controller.change.value++;
                         }
                       },
                       icon: Icon(

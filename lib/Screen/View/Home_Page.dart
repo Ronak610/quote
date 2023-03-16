@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,6 +27,7 @@ class _Home_PageState extends State<Home_Page> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              // gradient container
               Container(
                 height: 60,
                 width: double.infinity,
@@ -51,6 +53,7 @@ class _Home_PageState extends State<Home_Page> {
               Stack(
                 alignment: Alignment.bottomCenter,
                 children: [
+                  // carousel-slider
                   CarouselSlider.builder(
                     itemCount: home_controller.Images.length,
                     itemBuilder: (context, index, realIndex) {
@@ -85,6 +88,7 @@ class _Home_PageState extends State<Home_Page> {
                       },
                     ),
                   ),
+                  // ternary operate
                   Obx(
                     () => Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -122,14 +126,14 @@ class _Home_PageState extends State<Home_Page> {
                         alignment: Alignment.centerLeft,
                         child: Text("Most Popular")),
                     GridView.builder(
+                      physics: BouncingScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: home_controller.quotelist.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           mainAxisExtent:
                               MediaQuery.of(context).size.width / 2 - 30,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10),
+                         ),
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: () {
@@ -157,50 +161,132 @@ class _Home_PageState extends State<Home_Page> {
                   ],
                 ),
               ),
-              SizedBox(
-                height: 5,
-              ),
+
+              // data read
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  height: 200,
-                  width: 370,
+                  alignment: Alignment.center,
+                  height: 150,
+                  width: double.infinity,
                   color: Colors.black26,
-                  child: FutureBuilder(
-                    future: database_helper.readdb(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text("${snapshot.error}");
-                      } else if (snapshot.hasData) {
-                        List<Map>? l1 = snapshot.data;
-                        return ListView.builder(
-                          itemCount: l1!.length,
-                          itemBuilder: (context, index) {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [Text("${l1[index]['name']}")],
-                            );
-                          },
-                        );
-                      }
-                      return CircularProgressIndicator();
-                    },
+                  child: GetBuilder<Home_Controller>(
+                    builder: (controller) => FutureBuilder(
+                      future: database_helper.readdb(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Text("${snapshot.error}");
+                        } else if (snapshot.hasData) {
+                          List<Map>? s1 = snapshot.data;
+                          controller.l1 = s1!;
+                          print("=========== ${controller.l1!.length}");
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Quotes by Category",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: controller.l1!.length,
+                                  itemBuilder: (context, index) {
+                                    return InkWell(
+                                      onTap: () {
+                                        home_controller.data.value = home_controller.l1[index];
+                                        home_controller.change.value=0;
+                                        home_controller.DataIndex.value = index;
+                                        Get.toNamed('data');
+                                      },
+                                      child: Container(
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                              color: home_controller.quotelist[home_controller.int.value].colors,
+                                              borderRadius:
+                                              BorderRadius.circular(20)),
+                                          margin: EdgeInsets.all(5),
+                                          height: 100,
+                                          width: 150,
+                                          child: Text(
+                                            "${controller.l1[index]['author']}".toUpperCase(),
+                                            style:
+                                            GoogleFonts.satisfy(fontSize: 19,color: Colors.white),
+                                          )),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                        return CircularProgressIndicator();
+                      },
+                    ),
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 200,
-                  width: 370,
-                  color: Colors.black26,
+                padding: const EdgeInsets.all(4),
+                child: Column(
+                  children: [
+                    Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Most Popular")),
+                    GridView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: home_controller.quotelist.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisExtent:
+                          MediaQuery.of(context).size.width / 2 - 30,
+                      ),
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {
+                            home_controller.int.value = index;
+                            home_controller.change.value = 0;
+                            Get.toNamed('show');
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            margin: EdgeInsets.all(3),
+                            color: home_controller.quotelist[index].colors,
+                            height: 70,
+                            child: Text(
+                              "${home_controller.quotelist[index].author_name}",
+                              style: GoogleFonts.satisfy(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  ],
                 ),
               ),
+
             ],
           ),
         ),
+        // floating Action Button
         floatingActionButton: FloatingActionButton(
           onPressed: () {
+            Fluttertoast.showToast(
+                msg: "FloatingActionButton Open",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,backgroundColor: Colors.black,textColor: Colors.white);
             Get.toNamed('add');
           },
           child: Text(
